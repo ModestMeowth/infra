@@ -1,0 +1,37 @@
+- block:
+
+  - name: Unifi - create install directory
+    ansible.builtin.file:
+      path: /usr/local/docker/network/controller
+      state: directory
+      mode: "{{ docker_compose_directory_mask }}"
+      owner: "{{ docker_user.name }}"
+    become: true
+
+  - name: Unifi - create config directory
+    ansible.builtin.file:
+      path: /usr/local/docker/network/controller/data
+      state: directory
+      mode: "{{ docker_compose_directory_mask }}"
+      owner: "{{ docker_user.name }}"
+    become: true
+
+  - name: Unifi - create backup directory
+    ansible.builtin.file:
+      path: /data/backups/unifi-controller
+      state: directory
+      mode: "{{ docker_compose_directory_mask }}"
+      owner: "{{ docker_user.name }}"
+      group: "{{ docker_user.name }}"
+    become: true
+
+  - name: Unifi - install compose files
+    ansible.builtin.template:
+      src: files/network/unifi/docker-compose.yml
+      dest: /usr/local/docker/network/controller/docker-compose.yml
+      mode: "{{ docker_compose_directory_mask }}"
+      owner: "{{ docker_user.name }}"
+    become: true
+
+  tags:
+    - unifi

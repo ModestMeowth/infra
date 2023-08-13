@@ -1,0 +1,29 @@
+static_ip: 192.168.0.30
+
+zpools_to_scrub:
+  - zroot
+
+sanoid_datasets:
+  zroot:
+    use_template: production
+    recursive: true
+    process_children_only: true
+
+sanoid_templates:
+  production:
+    frequently: 2
+    hourly: 48
+    daily: 28
+    monthly: 3
+    yearly: 0
+    autosnap: true
+    autoprune: true
+
+  replaceable:
+    frequently: 0
+    hourly: 24
+    daily: 7
+    monthly: 0
+    yearly: 0
+    autosnap: true
+    autoprune: true

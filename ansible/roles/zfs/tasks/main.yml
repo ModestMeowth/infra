@@ -1,0 +1,16 @@
+- block:
+  - name: ZFS Scrub
+    ansible.builtin.cron:
+      name: scrub {{ item }} pool
+      hour: '2'
+      minute: '0'
+      weekday: '7'
+      job: zpool scrub {{ item }}
+    become: true
+    loop: "{{ zpools_to_scrub }}"
+
+  - name: Sanoid
+    include_tasks: sanoid.yml
+  tags:
+    - filesystem
+    - zfs

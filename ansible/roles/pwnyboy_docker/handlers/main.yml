@@ -1,0 +1,4 @@
+- name: restart traefik
+  shell:
+    chdir: /usr/local/docker/proxy
+    cmd: "{{ docker_update_command }}"

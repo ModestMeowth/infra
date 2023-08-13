@@ -1,0 +1,39 @@
+- name: Install sanoid
+  ansible.builtin.apt:
+    name: sanoid
+  become: true
+
+- name: Create config directory
+  ansible.builtin.file:
+    path: /etc/sanoid
+    state: directory
+    mode: "0755"
+  become: true
+
+- name: Install default config
+  ansible.builtin.file:
+    src: /usr/share/sanoid/sanoid.defaults.conf
+    dest: /etc/sanoid.defaults.conf
+    state: link
+  become: true
+
+- name: Install config
+  ansible.builtin.template:
+    src: files/sanoid.conf
+    dest: /etc/sanoid/sanoid.conf
+    mode: "0755"
+  become: true
+
+- name: Enable systemd services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    masked: false
+  loop: "{{ sanoid_services }}"
+  become: true
+
+- name: Start sanoid timer
+  ansible.builtin.systemd:
+    name: sanoid.timer
+    state: started
+  become: true

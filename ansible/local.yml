@@ -1,0 +1,32 @@
+- hosts: all
+  roles:
+    - role: base
+
+- hosts: zfs
+  roles:
+    - role: zfs
+
+- hosts: tailscale
+  roles:
+    - role: artis3n.tailscale
+      become: true
+      vars:
+        tailscale_args:  "--ssh"
+        tailscale_up_skip: true
+      tags:
+        - vpn
+
+- hosts: docker
+  roles:
+    - role: geerlingguy.docker
+      become: true
+      vars:
+        docker_install_compose_plugin: true
+        docker_users:
+          - "{{ me.user }}"
+      tags:
+        - docker
+
+- hosts: pwnyboy
+  roles:
+    - role: pwnyboy_docker

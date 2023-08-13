@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  traefik:
+    container_name: network-proxy
+    image: traefik:latest
+    restart: unless-stopped
+    user: "{{ docker_user.id }}"
+    environment:
+      - CF_DNS_API_TOKEN={{ cloudflare_api_token }}
+    volumes:
+      - /tmp/traefik-logs:/var/log/traefik
+      - ./traefik:/etc/traefik
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - docker-proxy
+    networks:
+      - default
+      - proxy
+      - private
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints:
+      traefik.http.routers.traefik.rule: Host(`proxy.pwnyboy.com`)
+
+      traefik.http.middlewares.traefik-auth.basicauth.users: "{{ basic_auth_user }}"
+      traefik.http.routers.traefik.middlewares: traefik-auth
+
+      traefik.http.routers.traefik.service: api@internal
+
+  docker-proxy:
+    container_name: utils-socket-proxy
+    image: tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    environment:
+      - CONTAINERS=1
+      - INFO=1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - private
+
+  cert-extractor:
+    container_name: utils-cert-extractor
+    image: slocomptech/traefik-cert-extract:latest
+    restart: unless-stopped
+    networks: []
+    volumes:
+      - ./traefik:/data:ro
+      - ./certs:/config/certs
+    logging:
+      driver: none
+
+networks:
+  proxy:
+    external: true
+  private:
+    internal: true

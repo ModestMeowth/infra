@@ -1,0 +1,7 @@
+collections:
+  - ansible.posix
+  - community.general
+
+roles:
+  - src: artis3n.tailscale
+  - src: geerlingguy.docker
