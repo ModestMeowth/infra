@@ -7,4 +7,4 @@ http:
     homeassistant:
       loadBalancer:
         servers:
-          - url: http://192.168.0.62:8123
+          - url: http://192.168.0.31:8123

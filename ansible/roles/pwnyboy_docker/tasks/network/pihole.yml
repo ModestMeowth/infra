@@ -2,7 +2,7 @@
 
   - name: Pihole - create install directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/pihole
+      path: "{{ docker_compose_path }}/network/pihole"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -10,7 +10,7 @@
 
   - name: Pihole - create config directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/pihole/conf
+      path: "{{ docker_compose_path }}/network/pihole/conf"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -19,16 +19,16 @@
   - name: Pihole - install dnsmasq conf
     ansible.builtin.template:
       src: files/network/pihole/domain.conf
-      dest: /usr/local/docker/network/pihole/domain.conf
-      mode: "{{ docker_compose_directory_mask }}"
+      dest: "{{ docker_compose_path }}/network/pihole/domain.conf"
+      mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     become: true
 
   - name: Unifi - install compose files
     ansible.builtin.template:
       src: files/network/pihole/docker-compose.yml
-      dest: /usr/local/docker/network/pihole/docker-compose.yml
-      mode: "{{ docker_compose_directory_mask }}"
+      dest: "{{ docker_compose_path }}/network/pihole/docker-compose.yml"
+      mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     become: true
 

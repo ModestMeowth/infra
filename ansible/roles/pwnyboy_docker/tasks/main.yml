@@ -32,7 +32,10 @@
         name: proxy
         internal: true
       become: true
+  tags:
+    - docker_setup
 
+- block:
     - name: Create docker directory
       ansible.builtin.file:
         path: /usr/local/docker
@@ -58,23 +61,17 @@
 
     - name: Install Reverse Proxy
       include_tasks: network/traefik.yml
-      tags:
-        - proxy
 
     - name: Install Pi-hole
       include_tasks: network/pihole.yml
-      tags:
-        - pihole
 
     - name: Install Unifi-controller
       include_tasks: network/unifi.yml
-      tags:
-        - unifi
 
     - name: Install Nextcloud
       include_tasks: cloud/nextcloud.yml
-      tags:
-        - cloud
-        - nextcloud
+
+    - name: Install Syncthing
+      include_tasks: cloud/syncthing.yml
   tags:
     - compose

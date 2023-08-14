@@ -29,16 +29,18 @@ services:
       - proxy
     labels:
       traefik.enable: true
-      traefik.http.routers.nextcloud.entrypoints: https
-      traefik.http.routers.nextcloud.rule: Host(`cloud.pwnyboy.com`)
+      traefik.docker.network: proxy
 
-      traefik.http.middlewares.nextcloud-dav.replacepathregex.regex: '^/.well-known/ca(l|rd)dav'
-      traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement: '/remote.php/dav/'
-      traefik.http.middlewares.nextcloud-hsts.headers.stsseconds: 15552000
-      traefik.http.routers.nextcloud.middlewares: nextcloud-dav,nextcloud-hsts
+      traefik.http.routers.cloud-nextcloud.entrypoints: https
+      traefik.http.routers.cloud-nextcloud.rule: Host(`cloud.pwnyboy.com`)
 
-      traefik.http.routers.nextcloud.service: nextcloud
-      traefik.http.services.nextcloud.loadbalancer.server.port: 80
+      traefik.http.middlewares.cloud-nextcloud-dav.replacepathregex.regex: '^/.well-known/ca(l|rd)dav'
+      traefik.http.middlewares.cloud-nextcloud-dav.replacepathregex.replacement: '/remote.php/dav/'
+      traefik.http.middlewares.cloud-nextcloud-hsts.headers.stsseconds: 15552000
+      traefik.http.routers.cloud-nextcloud.middlewares: cloud-nextcloud-dav,cloud-nextcloud-hsts
+
+      traefik.http.routers.cloud-nextcloud.service: cloud-nextcloud
+      traefik.http.services.cloud-nextcloud.loadbalancer.server.port: 80
 
   office:
     container_name: cloud-nextcloud-office
@@ -59,11 +61,13 @@ services:
       - proxy
     labels:
       traefik.enable: true
-      traefik.http.routers.office.entrypoints: https
-      traefik.http.routers.office.rule: Host(`office.pwnyboy.com`)
+      traefik.docker.network: proxy
 
-      traefik.http.routers.office.service: office
-      traefik.http.services.office.loadbalancer.server.port: 9980
+      traefik.http.routers.cloud-nextcloud-office.entrypoints: https
+      traefik.http.routers.cloud-nextcloud-office.rule: Host(`office.pwnyboy.com`)
+
+      traefik.http.routers.cloud-nextcoud-office.service: office
+      traefik.http.services.cloud-nextcloud-office.loadbalancer.server.port: 9980
 
   db:
     container_name: db-cloud-nextcloud

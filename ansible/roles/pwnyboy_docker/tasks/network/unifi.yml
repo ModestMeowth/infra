@@ -2,7 +2,7 @@
 
   - name: Unifi - create install directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/controller
+      path: "{{ docker_compose_path }}/network/controller"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -10,7 +10,7 @@
 
   - name: Unifi - create config directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/controller/data
+      path: "{{ docker_compose_path }}/network/controller/data"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -28,8 +28,8 @@
   - name: Unifi - install compose files
     ansible.builtin.template:
       src: files/network/unifi/docker-compose.yml
-      dest: /usr/local/docker/network/controller/docker-compose.yml
-      mode: "{{ docker_compose_directory_mask }}"
+      dest: "{{ docker_compose_path }}/network/controller/docker-compose.yml"
+      mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     become: true
 

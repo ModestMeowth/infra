@@ -2,7 +2,7 @@
 
   - name: Traefik - create install directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/proxy
+      path: "{{ docker_compose_path }}/network/proxy"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -10,7 +10,7 @@
 
   - name: Traefik - create config directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/proxy/traefik
+      path: "{{ docker_compose_path }}/network/proxy/traefik"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -18,7 +18,7 @@
 
   - name: Traefik - create file provider directory
     ansible.builtin.file:
-      path: /usr/local/docker/network/proxy/traefik/conf
+      path: "{{ docker_compose_path }}/network/proxy/traefik/conf"
       state: directory
       mode: "{{ docker_compose_directory_mask }}"
       owner: "{{ docker_user.name }}"
@@ -27,7 +27,7 @@
   - name: Traefik - install compose file
     ansible.builtin.template:
       src: files/network/traefik/docker-compose.yml
-      dest: /usr/local/docker/network/proxy/docker-compose.yml
+      dest: "{{ docker_compose_path }}/network/proxy/docker-compose.yml"
       mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
       validate: docker-compose -f %s config
@@ -37,7 +37,7 @@
   - name: Traefik - install config
     ansible.builtin.template:
       src: files/network/traefik/traefik.yml
-      dest: /usr/local/docker/network/proxy/traefik/traefik.yml
+      dest: "{{ docker_compose_path }}/network/proxy/traefik/traefik.yml"
       mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     notify: restart traefik
@@ -46,7 +46,7 @@
   - name: Traefik - install file provider
     ansible.builtin.template:
       src: files/network/traefik/file-provider-main.yml
-      dest: /usr/local/docker/network/proxy/traefik/conf/main.yml
+      dest: "{{ docker_compose_path }}/network/proxy/traefik/conf/main.yml"
       mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     notify: restart traefik
@@ -55,7 +55,7 @@
   - name: Traefik - install homeassistant provider
     ansible.builtin.template:
       src: files/network/traefik/file-provider-homeassistant.yml
-      dest: /usr/local/docker/network/proxy/traefik/conf/homeassistant.yml
+      dest: "{{ docker_compose_path }}/network/proxy/traefik/conf/homeassistant.yml"
       mode: "{{ docker_compose_file_mask }}"
       owner: "{{ docker_user.name }}"
     notify: restart traefik

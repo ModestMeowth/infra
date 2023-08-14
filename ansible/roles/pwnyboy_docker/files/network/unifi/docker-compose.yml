@@ -8,7 +8,7 @@ services:
       PGID: "{{ docker_user.id }}"
       TZ: "{{ timezone }}"
     volumes:
-      - /usr/local/docker/network/controller/data:/config
+      - ./data:/config
       - /data/backups/unifi-controller:/config/data/backup
     networks:
       - default
@@ -21,6 +21,7 @@ services:
       - 6789:6789
     labels:
       traefik.enable: true
+      traefik.docker.network: proxy
 
       traefik.http.routers.network-unifi.entrypoints: https
       traefik.http.routers.network-unifi.rule: Host(`unifi.pwnyboy.com`)

@@ -4,3 +4,5 @@ basic_auth_user: "{{ vault_basic_auth_user }}"
 nextcloud_admin_user: "{{ vault_nextcloud_admin_user }}"
 nextcloud_admin_password: "{{ vault_nextcloud_admin_password }}"
 pihole_webpassword: "{{ vault_pihole_webpassword }}"
+
+docker_compose_path: /usr/local/docker

@@ -22,6 +22,8 @@ services:
       - private
     labels:
       traefik.enable: true
+      traefik.docker.network: proxy
+
       traefik.http.routers.traefik.entrypoints:
       traefik.http.routers.traefik.rule: Host(`proxy.pwnyboy.com`)
 

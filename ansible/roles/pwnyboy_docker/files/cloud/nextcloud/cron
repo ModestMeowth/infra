@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
 exec /usr/bin/docker compose -f {{ docker_compose_path }}/cloud/nextcloud/docker-compose.yml \
-    exec -u www-data app php /var/www/html/occ "$@"
+    exec -u www-data app php -f /var/www/
