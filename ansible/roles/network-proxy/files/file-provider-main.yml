@@ -1,0 +1,29 @@
+http:
+  middlewares:
+    compress:
+      compress: {}
+
+    flocbloc:
+      headers:
+        customResponseHeaders:
+          Permissions-Policy: interest-cohort=()
+
+    hsts:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 31436000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    default-headers:
+      chain:
+        middlewares:
+          - hsts
+          - compress
+          - flocbloc

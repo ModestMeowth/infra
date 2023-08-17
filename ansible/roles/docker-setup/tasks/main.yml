@@ -1,0 +1,57 @@
+- name: install daemon.json
+  ansible.builtin.template:
+    src: files/daemon.json
+    dest: /etc/docker/daemon.json
+    mode: '0755'
+  become: true
+  when: docker_use_zfs
+
+- name: override docker service for zfs dependencies
+  ansible.builtin.file:
+    path: /etc/systemd/systemd/docker.service.d
+    state: directory
+    mode: '0755'
+  become: true
+  when: docker_use_zfs
+
+- name: create override.conf
+  ansible.builtin.template:
+    src: files/zfs-override.conf
+    dest: /etc/systemd/systemd/docker.service.d/zfs-override.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  when: docker_use_zfs
+
+- name: Create network
+  community.docker.docker_network:
+    name: proxy
+    ipam_config:
+      - subnet: 172.20.0.0/16
+        gateway: 172.20.0.1
+    internal: true
+  become: true
+
+- name: Create docker directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}"
+    state: directory
+    owner: root
+    group: docker
+    mode:  '2770'
+  become: true
+
+- name: Create category directories
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}/{{ item }}"
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+  loop:
+    - network
+    - monitoring
+    - utils
+    - cloud
+    - apps
+    - servarr

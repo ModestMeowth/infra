@@ -1,0 +1,13 @@
+photos_compose_path: "{{ docker_compose_path }}/cloud/photos"
+release: release
+
+db_hostname: db
+db_port: db
+db_username: postgres
+db_password: postges
+db_database: postgres
+
+redis_hostname: redis
+
+gpu_acceleration:
+is_wsl: false

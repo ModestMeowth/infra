@@ -1,0 +1,16 @@
+http:
+  routers:
+    cockpit:
+      entryPoints:
+        - https
+      rule: Host(`pwnyboy.com`)
+      middlewares:
+        - default-headers
+      service: cockpit
+  services:
+    cockpit:
+      loadBalancer:
+        servers:
+          - url: https://{{ static_ip.ipv4 }}:9090
+            scheme: https
+        passHostHeader: true

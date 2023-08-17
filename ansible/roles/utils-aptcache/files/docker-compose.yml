@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  app:
+    image: sameersbn/apt-cacher-ng:latest
+    container_name: utils-aptcache
+    restart: unless-stopped
+    environment:
+      TZ: "{{ timezone }}"
+    ports:
+      - "{{ static_ip.ipv4 }}:3142:3142"
+    volumes:
+      - /var/cache/aptcache
+    labels:
+      traefik.enable: false

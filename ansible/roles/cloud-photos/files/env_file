@@ -1,0 +1,5 @@
+DB_HOSTNAME=db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABSE_NAME=postgres
+REDIS_HOSTNAME=redis

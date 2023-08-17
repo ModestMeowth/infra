@@ -1,4 +1,9 @@
-static_ip: 192.168.0.30
+hostname: pwnyboy.com
+
+static_ip:
+  ipv4: 192.168.0.30
+
+tailscale_auth_token: "{{ vault_tailscale_auth_token }}"
 
 systemd_resolved_disabled: true
 
@@ -29,3 +34,16 @@ sanoid_templates:
     yearly: 0
     autosnap: true
     autoprune: true
+
+docker_compose_path: /usr/local/docker
+docker_use_zfs: true
+
+cloudflare_api_token: "{{ vault_cloudflare_api_token }}"
+cloudflare_email: "{{ vault_cloudflare_email }}"
+
+proxy_basic_auth_user: "{{ vault_proxy_basic_auth_user }}"
+
+nextcloud_admin_user: "{{ vault_nextcloud_admin_user }}"
+nextcloud_admin_password: "{{ vault_nextcloud_admin_password }}"
+
+pihole_webpassword: "{{ vault_pihole_webpassword }}"

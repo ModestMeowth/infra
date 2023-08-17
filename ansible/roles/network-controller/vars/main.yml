@@ -1,0 +1,11 @@
+exposed_ports:
+    # STUN
+  - "3478/udp"
+    # Inform
+  - "8080"
+    # AP Discovery
+  - "10001/udp"
+    # L2 Discovery
+  - "1900/udp"
+    # Mobile thoughput test
+  - "6789"

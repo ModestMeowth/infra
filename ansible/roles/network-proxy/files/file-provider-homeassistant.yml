@@ -1,0 +1,15 @@
+http:
+  routers:
+    homeassistant:
+      entryPoints:
+        - https
+      rule: Host(`home.pwnyboy.com`)
+      middlewares:
+        - default-headers
+      service: homeassistant
+  services:
+    homeassistant:
+      loadBalancer:
+        servers:
+          - url: http://192.168.0.31:8123
+        passHostHeader: true

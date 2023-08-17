@@ -1,0 +1,43 @@
+- name: Unifi - create install directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}/network/controller"
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Unifi - create config directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}/network/controller/data"
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Unifi - create backup directory
+  ansible.builtin.file:
+    path: /data/backups/unifi-controller
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+    group: "{{ docker_user.name }}"
+  become: true
+
+- name: Unifi - install compose files
+  ansible.builtin.template:
+    src: files/docker-compose.yml
+    dest: "{{ docker_compose_path }}/network/controller/docker-compose.yml"
+    mode: "{{ docker_compose_file_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Unifi - configure firewall
+  community.general.ufw:
+    rule: allow
+    direction: in
+    interface: bridge0
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop: "{{ exposed_ports }}"
+  become: true
+  notify: reload firewall rules

@@ -1,0 +1,33 @@
+#jinja2:lstrip_blocks: True
+version: "3.8"
+services:
+  app:
+    container_name: network-controller
+    image: lscr.io/linuxserver/unifi-controller:latest
+    environment:
+      PUID: "{{ docker_user.id }}"
+      PGID: "{{ docker_user.id }}"
+      TZ: "{{ timezone }}"
+    volumes:
+      - ./data:/config
+      - /data/backups/unifi-controller:/config/data/backup
+    networks:
+      - default
+      - proxy
+    ports:
+      {% for port in exposed_ports %}
+      - {{ static_ip.ipv4 }}:{{ port.port }}:{{ port.port }}
+      {% endfor %}
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+
+      traefik.http.routers.network-unifi.entrypoints: https
+      traefik.http.routers.network-unifi.rule: Host(`unifi.pwnyboy.com`)
+
+      traefik.http.services.network-unifi.loadbalancer.server.scheme: https
+      traefik.http.services.network-unifi.loadbalancer.server.port: 8443
+
+networks:
+  proxy:
+    external: true

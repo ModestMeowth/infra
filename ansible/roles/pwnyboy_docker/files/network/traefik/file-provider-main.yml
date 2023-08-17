@@ -1,9 +1,0 @@
-http:
-  middlewares:
-    compress:
-      compress: {}
-
-    floc-block:
-      headers:
-        customResponseHeaders:
-          Permissions-Policy: interest-cohort=()

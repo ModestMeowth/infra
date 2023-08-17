@@ -1,0 +1,36 @@
+#jinja2:lstrip_blocks: True
+version: "3.8"
+services:
+  pihole:
+    container_name: network-pihole
+    image: pihole/pihole
+    restart: unless-stopped
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+      - 9.9.9.9
+    environment:
+      TZ: "{{ timezone }}"
+      WEBPASSWORD: "{{ pihole_webpassword }}"
+    ports:
+      - {{ static_ip.ipv4 }}:53:53/tcp
+      - {{ static_ip.ipv4 }}:53:53/udp
+    volumes:
+      - ./conf:/etc/pihole
+      - ./domain.conf:/etc/dnsmasq.d/02-domain.conf
+    networks:
+      - default
+      - proxy
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+
+      traefik.http.routers.network-pihole.entrypoints: https
+      traefik.http.routers.network-pihole.rule: Host(`pihole.pwnyboy.com`)
+
+      traefik.http.routers.network-pihole.service: network-pihole
+      traefik.http.services.network-pihole.loadbalancer.server.port: 80
+
+networks:
+  proxy:
+    external: true

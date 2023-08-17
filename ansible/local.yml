@@ -1,10 +1,14 @@
 - hosts: all
   roles:
     - role: base
+  tags:
+    - base
 
 - hosts: zfs
   roles:
     - role: zfs
+  tags:
+    - filesystem
 
 - hosts: tailscale
   roles:
@@ -13,8 +17,15 @@
       vars:
         tailscale_args:  "--ssh"
         tailscale_up_skip: true
-      tags:
-        - vpn
+    - role: tailscale
+  tags:
+    - tailscale
+
+- hosts: cockpit
+  roles:
+    - role: cockpit
+  tags:
+    - cockpit
 
 - hosts: docker
   roles:
@@ -24,9 +35,36 @@
         docker_install_compose_plugin: true
         docker_users:
           - "{{ me.user }}"
-      tags:
-        - docker
+  tags:
+    - docker
 
 - hosts: pwnyboy
   roles:
-    - role: pwnyboy_docker
+    - role: docker-setup
+      tags:
+        - docker
+        - docker-setup
+      # Docker containers
+    - role: network-proxy
+      tags:
+        - proxy
+    - role: network-controller
+      tags:
+        - unifi
+    - role: network-pihole
+      tags:
+        - pihole
+    - role: utils-aptcache
+      tags:
+        - aptcache
+    - role: cloud-nextcloud
+      tags:
+        - nextcloud
+    - role: cloud-syncthing
+      tags:
+        - syncthing
+    - role: cloud-photos
+      tags:
+        - photos
+  tags:
+    - compose

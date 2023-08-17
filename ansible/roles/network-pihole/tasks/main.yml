@@ -1,0 +1,31 @@
+- name: Pihole - create install directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}/network/pihole"
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Pihole - create config directory
+  ansible.builtin.file:
+    path: "{{ docker_compose_path }}/network/pihole/conf"
+    state: directory
+    mode: "{{ docker_compose_directory_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Pihole - install dnsmasq conf
+  ansible.builtin.template:
+    src: files/domain.conf
+    dest: "{{ docker_compose_path }}/network/pihole/domain.conf"
+    mode: "{{ docker_compose_file_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true
+
+- name: Pihole - install compose files
+  ansible.builtin.template:
+    src: files/docker-compose.yml
+    dest: "{{ docker_compose_path }}/network/pihole/docker-compose.yml"
+    mode: "{{ docker_compose_file_mask }}"
+    owner: "{{ docker_user.name }}"
+  become: true

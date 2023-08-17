@@ -1,0 +1,4 @@
+- name: reload firewall rules
+  community.general.ufw:
+    state: reloaded
+  become: true

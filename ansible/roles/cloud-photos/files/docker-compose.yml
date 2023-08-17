@@ -1,0 +1,133 @@
+#jinja2:lstrip_blocks: True
+version: "3.8"
+services:
+
+  server:
+    container_name: cloud-photos-server
+    image: ghcr.io/immich-app/immich-server:{{ release }}
+    restart: unless-stopped
+    command: [ "start.sh", "immich" ]
+    environment:
+      DB_HOSTNAME: db
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+      DB_DATABASE_NAME: postgres
+      REDIS_HOSTNAME: redis
+      TYPESENSE_API_KEY: "{{ typesense_api_key }}"
+      IMMICH_MACHINE_LEARNING_URL: http://machine-learning:3003
+    volumes:
+      - /data/cloud/photos/upload:/usr/src/app/upload
+    depends_on:
+      - db
+      - redis
+      - typesense
+
+  microservices:
+    container_name: cloud-photos-microservices
+    image: ghcr.io/immich-app/immich-server:{{ release }}
+    {% if gpu_acceleration == 'nvidia' %}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+                - video
+    {% else %}
+    devices:
+      - /dev/dri:/dev/dri
+    {% endif %}
+    restart: unless-stopped
+    command: [ "start.sh", "microservices" ]
+    environment:
+      DB_HOSTNAME: db
+      DB_PASSWORD: postgres
+      DB_USERNAME: postgres
+      DB_DATABASE_NAME: postgres
+      REDIS_HOSTNAME: redis
+      TYPESENSE_API_KEY: "{{ typesense_api_key }}"
+      IMMICH_MACHINE_LEARNING_URL: http://machine-learning:3003
+      TZ: "{{ timezone }}"
+      {% if gpu_acceleration == 'nvidia' %}
+      NVIDIA_DRIVER_CAPABILITIES: all
+      {% endif %}
+      {% if is_wsl %}
+      LD_LIBRARY_PATH: /usr/lib/wsl/lib
+        {% if gpu_acceleration == 'vaapi' %}
+      - LIBVA_DRIVER_NAME=d3d12
+        {% endif %}
+      {% endif %}
+    volumes:
+      - /data/cloud/photos/upload:/usr/src/app/upload
+      {% if gpu_acceleration == 'wsl' %}
+      - /usr/lib/wsl:/usr/lib/wsl
+      {% endif %}
+    depends_on:
+      - db
+      - redis
+      - typesense
+
+  machine-learning:
+    container_name: cloud-photos-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:{{ release }}
+    restart: unless-stopped
+    volumes:
+      - /var/cache/photos-model-cache:/cache
+
+  webapp:
+    container_name: cloud-photos-webapp
+    image: ghcr.io/immich-app/immich-web:{{ release }}
+    restart: unless-stopped
+    environment:
+      IMMICH_SERVER_URL: http://server:3001
+
+  typesense:
+    container_name: cloud-photos-typesense
+    image: typesense/typesense:0.25.0
+    environment:
+      TYPESENSE_API_KEY: "{{ typesense_api_key }}"
+      TYPESENSE_DATA_DIR: "/data"
+    volumes:
+      - /var/cache/photos-typesense:/data
+
+  db:
+    container_name: db-cloud-photos
+    image: postgres:latest
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - /var/db/postgresql/photos:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis-cloud-photos
+    image: redis:latest
+    restart: unless-stopped
+
+  proxy:
+    container_name: cloud-photos
+    image: ghcr.io/immich-app/immich-proxy:{{ release }}
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy
+    environment:
+      IMMICH_SERVER_URL: http://server:3001
+      IMMICH_WEB_URL: http://webapp:3000
+    depends_on:
+      - server
+      - webapp
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+
+      traefik.http.routers.cloud-photos.entrypoints: https
+      traefik.http.routers.cloud-photos.rule: Host(`photos.pwnyboy.com`)
+
+      traefik.http.routers.cloud-photos.service: cloud-photos
+      traefik.http.services.cloud-photos.loadbalancer.server.port: 8080
+networks:
+  proxy:
+    external: true

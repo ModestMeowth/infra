@@ -1,0 +1,47 @@
+- name: Install fish repo
+  ansible.builtin.apt_repository:
+    repo: ppa:fish-shell/release-3
+    filename: fish-shell
+  become: true
+
+- name: Setup backports
+  ansible.builtin.template:
+    src: files/backports.pref
+    dest: /etc/apt/preferences.d/backports.pref
+  become: true
+
+- name: Disable phased-updates
+  ansible.builtin.copy:
+    src: files/phased-updates.conf
+    dest: /etc/apt/apt.conf.d/80PhasedUpdates
+  become: true
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ item.name }}"
+    install_recommends: "{{ item.recommends|default(omit) }}"
+    update_cache: true
+  become: true
+  loop:
+    - name: git
+    - name: fish
+    - name: ufw
+    - name: vim-nox
+    - name: python3-pip
+    - name: python3-docker
+    - name: python3-venv
+      recommends: false
+
+- name: Install nala repos
+  ansible.builtin.apt:
+    deb: "{{ item.url }}"
+    update_cache: true
+  become: true
+  loop:
+    - url: https://gitlab.com/volian/volian-archive/uploads/b20bd8237a9b20f5a82f461ed0704ad4/volian-archive-keyring_0.1.0_all.deb
+    - url: https://gitlab.com/volian/volian-archive/uploads/d6b3a118de5384a0be2462905f7e4301/volian-archive-nala_0.1.0_all.deb
+
+- name: Install nala
+  ansible.builtin.apt:
+    name: nala
+  become: true

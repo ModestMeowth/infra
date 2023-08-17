@@ -1,0 +1,21 @@
+- name: Tailscale - set firewall rule
+  community.general.ufw:
+    rule: allow
+    direction: in
+    interface: tailscale0
+  become: true
+  notify: reload firewall rules
+
+- name: Tailscale - set firewall incoming policy
+  community.general.ufw:
+    default: deny
+    direction: incoming
+  become: true
+  notify: reload firewall rules
+
+- name: Tailscale - set firewall outgoing policy
+  community.general.ufw:
+    default: allow
+    direction: outgoing
+  become: true
+  notify: reload firewall rules
